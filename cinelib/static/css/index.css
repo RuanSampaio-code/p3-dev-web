@@ -1,0 +1,26 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 56px);
+}
+
+.login-box {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    color: black;
+}
+
+.light-mode {
+    background-color: #f5f5f5;
+    color: #000000;
+}
+
+.light-mode .login-box {
+    background-color: white;
+    color: black;
+}
