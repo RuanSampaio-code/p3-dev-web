@@ -3,6 +3,7 @@
 
 
 body{
+
     font-family:"Montserrat", serif;
-    background-image: url("../images/background.png")
+    background-image: url("{{ url_for('static', filename='/static/images/background.png') }}");
 }
