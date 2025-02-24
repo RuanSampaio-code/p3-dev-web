@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -8,4 +8,4 @@ database = SQLAlchemy(app)
 
 @app.route('/')
 def home():
-    return "Olá, Flask!"
+    return render_template('index.html')

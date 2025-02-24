@@ -1,5 +1,4 @@
 from cinelib import database
-from cinelib import database
 
 class Usuario(database.Model):
     id = database.Column(database.Integer, primary_key=True)
