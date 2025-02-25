@@ -1,0 +1,34 @@
+/* Estiliza a navbar */
+ /* Estiliza a navbar */
+ .navbar-custom {
+    background-color: #333333;
+    padding: 2rem;
+}
+
+.navbar-custom .nav-link {
+    color: white;
+}
+
+.navbar-custom .nav-link:hover {
+    color: #cccccc;
+}
+
+.navbar-custom .form-control {
+    border-radius: 20px;
+}
+
+.navbar-custom .btn-search {
+    border: none;
+    background: none;
+}
+
+.navbar-custom .btn-search:hover {
+    color: #cccccc;
+}
+
+
+.img-100x180 {
+    width: 100px;
+    height: 180px;
+    object-fit: cover;
+}

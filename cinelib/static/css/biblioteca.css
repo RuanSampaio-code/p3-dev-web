@@ -1,0 +1,23 @@
+
+
+body{
+    height: 100vh;
+    font-family:"Montserrat", serif;
+}
+
+.biblioteca{
+    padding: 1% 8%;
+}
+
+.container-button-list{
+    height: 70vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.button-list{
+    width: 45%;
+    height:50%;
+    border: none;
+}

@@ -5,5 +5,5 @@
 body{
 
     font-family:"Montserrat", serif;
-    background-image: url("{{ url_for('static', filename='/static/images/background.png') }}");
+    background-image: url("/static/images/background.png");
 }
