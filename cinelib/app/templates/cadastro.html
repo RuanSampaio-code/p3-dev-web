@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Usuário</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+
+  <link rel="stylesheet" hhref="{{ url_for('static', filename='css/cadastro.css') }}">
+  
+</head>
+<body>
+  <div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-lg w-50">
+        <h2 class="text-center mb-4">Cadastro de Usuário</h2>
+        <form action="{{ url_for('register') }}" method="POST">
+            <!-- Campo de Nome -->
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="nome" name="nome" placeholder="Digite seu nome" required>
+            </div>
+
+            <!-- Campo de E-mail -->
+            <div class="mb-3">
+                <label for="email" class="form-label">E-mail</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Digite seu e-mail" required>
+            </div>
+
+            <!-- Campo de Senha -->
+            <div class="mb-3">
+                <label for="senha" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="senha" name="senha" placeholder="Digite sua senha" required>
+            </div>
+
+            <!-- Campo de Confirmação de Senha -->
+            <div class="mb-3">
+                <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
+                <input type="password" class="form-control" id="confirmarSenha" placeholder="Confirme sua senha" required>
+            </div>
+
+            <!-- Botão de Cadastro -->
+            <button type="submit" class="btn btn-dark btn-lg w-100">Cadastrar</button>
+        </form>
+    </div>
+</div>
+
+
+  <!-- Bootstrap JS e Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
