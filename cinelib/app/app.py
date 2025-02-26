@@ -99,7 +99,6 @@ def load_user(user_id):
 
 #cadastro
 
-@app.route('/cadastro', methods=['GET', 'POST'])
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def register():
@@ -129,10 +128,26 @@ def register():
             flash('Erro ao criar conta. Tente novamente.', 'danger')
 
     return render_template('cadastro.html')
+
 #Pagina da biblioteca
 @app.route('/biblioteca', methods=['GET', 'POST'])
+@login_required
 def pageBiblioteca(): 
     return render_template('biblioteca.html')
+
+
+#Pagina de lista de filmes e series para assitir
+@app.route('/biblioteca/ListaParaAssitir', methods=['GET', 'POST'])
+@login_required
+def pageListaParaAssistir(): 
+    return render_template('filmeSerieParaAssistir.html')
+
+
+#Pagina de lista de filmes e series já assistidos
+@app.route('/biblioteca/ListaJaAssitido', methods=['GET', 'POST'])
+@login_required
+def pageListaJaAssistido(): 
+    return render_template('filmeSerieAssistido.html')
 
 
 #Pagina de recomendacao
