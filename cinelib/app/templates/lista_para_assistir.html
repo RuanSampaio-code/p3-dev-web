@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+        
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmes para Assistir</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+</head>
+
+<body class="light-mode">
+    {% include 'navbar.html' %}
+
+    <h2 class="text-white text-center py-3">Filmes e Séries para Assistir</h2>
+
+    <div class="container d-flex justify-content-center">
+      <div class="row w-100">
+          {% for obra in obras %}
+          <div class="col-12 mb-3"> <!-- A coluna ocupa 100% da largura -->
+              <div class="card mb-3 mx-auto" style="max-width: 800px;">
+                  <div class="row g-0 align-items-center">
+                      <div class="col-md-4">
+                          <img src="{{ obra[4] }}" class="img-fluid w-100" style="object-fit: cover;" alt="{{ obra[0] }}">
+                      </div>
+                      <div class="col-md-8">
+                          <div class="card-body bg-white">
+                              <h5 class="card-title">{{ obra[0] }}</h5>
+                              <p class="card-text"><strong>Ano de Lançamento:</strong> {{ obra[1] }}</p>
+                              <p class="card-text"><strong>Sinopse:</strong> {{ obra[2] }}</p>
+                              <p class="card-text"><strong>Duração:</strong> {{ obra[3] }} minutos</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
+  </div>
+  
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

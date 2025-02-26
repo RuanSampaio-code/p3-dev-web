@@ -5,6 +5,7 @@ import requests  # requests deve ser importado separadamente
 #Lib para banco de dados
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import sqlite3  # Ou qualquer outro banco de dados que você esteja usando
 
 #Lib auteticação
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -265,7 +266,10 @@ def adicionar_catalogo():
         ano=int(data['ano']),
         genero='Desconhecido',  # Você pode ajustar isso conforme a resposta da API
         duracao=120,  # Aqui também você pode ajustar conforme a resposta da API (exemplo de duração de 120 minutos)
-        foto = f"https://image.tmdb.org/t/p/w200{data.get('poster_path', '')}" , # Usa o get() para evitar erro se a chave não existir
+        foto = f"https://image.tmdb.org/t/p/w200{data.get('poster_path', '')}",
+
+       # https://image.tmdb.org/t/p/w200/3onmLeu48mY87UclP3fk2x7YPqw.jpg
+ # Usa o get() para evitar erro se a chave não existir
   # Altere 'foto' para 'poster_path'
  # Adicione a foto do filme/série
         tipo=data['tipo'],
@@ -282,6 +286,51 @@ def adicionar_catalogo():
 
 
 
+
+# Conectando ao banco de dados e recuperando os filmes
+def get_filmes_para_assistir():
+    # Conecte-se ao banco de dados (substitua pelo seu banco de dados)
+    conn = sqlite3.connect('instance/cinelib.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT titulo, ano, sinopse, duracao, foto FROM Catalogo WHERE assistido = 0")  # 0 significa não assistido
+    obras = cursor.fetchall()
+    conn.close()
+    return obras
+
+@app.route('/lista-para-assistir')
+def lista_para_assistir():
+    obras = get_filmes_para_assistir()
+    return render_template('lista_para_assistir.html', obras=obras)
+
+
+
+# Conectando ao banco de dados e recuperando os filmes
+def get_filmes_ja_assistidos():
+    # Conecte-se ao banco de dados (substitua pelo seu banco de dados)
+    conn = sqlite3.connect('instance/cinelib.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT id,titulo, ano, sinopse, duracao, foto FROM Catalogo WHERE assistido = 1")  # 0 significa não assistido
+    obras = cursor.fetchall()
+    conn.close()
+    return obras
+
+@app.route('/lista-ja-assitidos')
+def lista_ja_assistidos():
+    obras = get_filmes_ja_assistidos()
+    return render_template('lista_ja_assistidos.html', obras=obras)
+
+
+@app.route('/salvar_nota/<int:obra_id>', methods=['POST'])
+def salvar_nota(obra_id):
+    nota = request.form.get('nota')
+    if nota:
+        # Salvar a nota no banco de dados para o filme com ID `obra_id`
+        # Adapte esse código conforme sua lógica de banco de dados
+        obra = Catalogo.query.get(obra_id)  # Exemplo com SQLAlchemy
+        obra.nota = nota
+        db.session.commit()
+        return redirect(url_for('lista_ja_assistidos'))  # Redireciona para a lista de filmes
+    return "Nota não salva", 400
 
 
 
