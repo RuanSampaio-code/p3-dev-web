@@ -40,20 +40,48 @@
         event.preventDefault(); // Impede o comportamento padrão do link
     
         var searchBox = document.getElementById('search-box');
-        if (searchBox.style.display === 'none') {
-            searchBox.style.display = 'block'; // Mostra o input de busca
-        } else {
-            searchBox.style.display = 'none'; // Esconde o input de busca
-        }
+        searchBox.style.display = searchBox.style.display === 'none' ? 'block' : 'none';
     });
-    
-    document.getElementById('search-button').addEventListener('click', function() {
+
+    /* document.getElementById('search-button').addEventListener('click', function() {
         var searchTerm = document.getElementById('search-input').value;
         if (searchTerm) {
-            alert('Você buscou por: ' + searchTerm); // Exemplo de ação de busca
+            fetch(`/search?query=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.results) {
+                        displayResults(data.results);
+                    } else {
+                        alert("Nenhum filme encontrado!");
+                    }
+                })
+                .catch(error => console.error("Erro ao buscar filmes:", error));
+        }
+    }); */
+
+    document.getElementById('search-button').addEventListener('click', function() {
+    var searchTerm = document.getElementById('search-input').value;
+    if (searchTerm) {
+        // Redireciona diretamente para a página de pesquisa
+        window.location.href = `/search?query=${encodeURIComponent(searchTerm)}`;
         }
     });
-    
+
+    function displayResults(movies) {
+        let resultDiv = document.getElementById('search-results');
+        resultDiv.innerHTML = "";  // Limpa resultados anteriores
+
+        movies.forEach(movie => {
+            let movieItem = document.createElement('div');
+            movieItem.classList.add('movie-item');
+            movieItem.innerHTML = `
+                <h3>${movie.title} (${movie.release_date ? movie.release_date.split('-')[0] : 'Desconhecido'})</h3>
+                <p>${movie.overview ? movie.overview : 'Sem descrição disponível.'}</p>
+                <img src="https://image.tmdb.org/t/p/w200${movie.poster_path}" alt="${movie.title}">
+            `;
+            resultDiv.appendChild(movieItem);
+        });
+    }
     
 </script>
     

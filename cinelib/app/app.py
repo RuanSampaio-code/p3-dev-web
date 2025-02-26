@@ -1,7 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
+import requests  # requests deve ser importado separadamente
+
 
 #Lib para banco de dados
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 #Lib auteticação
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -12,6 +15,11 @@ app = Flask(__name__)
 
 app.secret_key = 'sua_chave_super_secreta'  # Substitua por algo único e seguro
 
+# Sua chave de API do TMDb (substitua pela sua)
+TMDB_API_KEY = "3b653dd935ec9fc21b679170f3bff41a"
+TMDB_BASE_URL = "https://api.themoviedb.org/3"
+
+
 
 # Configurar a URI do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cinelib.db'
@@ -19,6 +27,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 login_manager = LoginManager(app)
@@ -50,6 +59,16 @@ class Catalogo(db.Model):
     tipo = db.Column(db.String(50), nullable=False)  # Pode ser "Filme" ou "Série"
     assistido = db.Column(db.Boolean, default=False, nullable=False)  # Indica se já foi assistido
     id_usuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)  # Chave estrangeira
+
+    # Novo campo de nota, com valor entre 0 e 10
+    nota = db.Column(db.Float, nullable=True)  # Pode ser nulo ou com valores entre 0 e 10
+
+    # Validação de nota (opcional, dependendo da biblioteca que você está usando)
+    def set_nota(self, nota):
+        if 0 <= nota <= 10:
+            self.nota = nota
+        else:
+            raise ValueError("A nota deve estar entre 0 e 10.")
 
     def __repr__(self):
         return f'<Catalogo {self.titulo}>'
@@ -98,8 +117,6 @@ def load_user(user_id):
 
 
 #cadastro
-
-
 @app.route('/cadastro', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -157,7 +174,6 @@ def pageRecomedacao():
     return render_template('recomendacao.html')
 
 #pagina de perfil
-
 @app.route('/perfil', methods=['GET', 'POST'])
 @login_required
 def pagePerfil():
@@ -180,6 +196,104 @@ def pagePerfil():
 
     return render_template('perfil.html', usuario=current_user)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Tratando a api
+""" @app.route('/search', methods=['GET'])
+def search_movie():
+    query = request.args.get('query')  # Obtém o termo da pesquisa do input
+    if not query:
+        return jsonify({"error": "Nenhuma pesquisa foi fornecida"}), 400
+
+    # Fazendo a requisição à API do TMDb
+    url = f"{TMDB_BASE_URL}/search/movie?api_key={TMDB_API_KEY}&query={query}"
+    response = requests.get(url)
+    
+    if response.status_code != 200:
+        return jsonify({"error": "Erro ao buscar filmes"}), 500
+
+    data = response.json()
+    return jsonify(data)  """ # Retorna os dados da API como JSON
+
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('query')
+
+    if not query:
+        return jsonify({"error": "Nenhum termo de busca fornecido"}), 400
+
+    url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={query}"
+    
+    response = requests.get(url)
+    data = response.json()
+
+    print("Resultados da pesquisa:", data)  # Verifique se os resultados estão corretos
+
+    # Passando os resultados para a página de resultados
+    return render_template('pesquisaCatalogo.html', movies=data.get('results', []))
+
+
+
+
+@app.route('/adicionar_catalogo', methods=['POST'])
+def adicionar_catalogo():
+    data = request.get_json()
+    
+    # Verificar se os dados necessários estão presentes
+    if not data.get('id') or not data.get('titulo') or not data.get('tipo'):
+        return jsonify({"error": "Dados incompletos."}), 400
+
+    # Criar um novo objeto Catalogo
+    novo_item = Catalogo(
+        titulo=data['titulo'],
+        sinopse=data['sinopse'],
+        ano=int(data['ano']),
+        genero='Desconhecido',  # Você pode ajustar isso conforme a resposta da API
+        duracao=120,  # Aqui também você pode ajustar conforme a resposta da API (exemplo de duração de 120 minutos)
+        foto = f"https://image.tmdb.org/t/p/w200{data.get('poster_path', '')}" , # Usa o get() para evitar erro se a chave não existir
+  # Altere 'foto' para 'poster_path'
+ # Adicione a foto do filme/série
+        tipo=data['tipo'],
+        assistido=data['assistido'],
+        id_usuario=current_user.id  # Supondo que você tenha um sistema de autenticação para pegar o usuário atual
+    )
+
+    # Adicionar no banco de dados
+    db.session.add(novo_item)
+    db.session.commit()
+
+    return jsonify({"success": True})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
@@ -188,3 +302,4 @@ if __name__ == '__main__':
 """ with app.app_context():
     db.create_all()
     print("Tabelas criadas com sucesso!") """
+
