@@ -49,10 +49,12 @@
                                 <h5 class="card-title">{{ movie.title }}</h5>
                                 <p class="card-text">{{ movie.overview[:100] }}...</p>
                                 <!-- Botões de ação -->
-                                <button class="btn btn-primary" onclick="adicionarAoCatalogo('{{ movie.id }}', '{{ movie.title }}', '{{ movie.overview }}', '{{ movie.release_date.split('-')[0] }}', 'Filme', true)">
+                                <button class="btn btn-primary" 
+                                        onclick="adicionarAoCatalogo('{{ movie.id }}', '{{ movie.title }}', '{{ movie.overview }}', '{{ movie.release_date.split('-')[0] }}', 'Filme', true, '{{ movie.poster_path }}')">
                                     Já assistido
                                 </button>
-                                <button class="btn btn-primary" onclick="adicionarAoCatalogo('{{ movie.id }}', '{{ movie.title }}', '{{ movie.overview }}', '{{ movie.release_date.split('-')[0] }}', 'Filme', false)">
+                                <button class="btn btn-primary" 
+                                        onclick="adicionarAoCatalogo('{{ movie.id }}', '{{ movie.title }}', '{{ movie.overview }}', '{{ movie.release_date.split('-')[0] }}', 'Filme', false, '{{ movie.poster_path }}')">
                                     Assistir mais tarde
                                 </button>
                             </div>
@@ -70,22 +72,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        function adicionarAoCatalogo(id, titulo, sinopse, ano, tipo, assistido) {
+        function adicionarAoCatalogo(id, titulo, sinopse, ano, tipo, assistido, posterPath) {
             // Enviar os dados para o backend
             fetch('/adicionar_catalogo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    id: id,
-                    titulo: titulo,
-                    sinopse: sinopse,
-                    ano: ano,
-                    tipo: tipo,
-                    assistido: assistido
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: id,
+                titulo: titulo,
+                sinopse: sinopse,
+                ano: ano,
+                tipo: tipo,
+                assistido: assistido,
+                poster_path: posterPath // Adicionando o poster_path
             })
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

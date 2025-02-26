@@ -18,25 +18,28 @@
 
     <div class="container d-flex justify-content-center">
       <div class="row w-100">
-          {% for obra in obras %}
-          <div class="col-12 mb-3"> <!-- A coluna ocupa 100% da largura -->
-              <div class="card mb-3 mx-auto" style="max-width: 800px;">
-                  <div class="row g-0 align-items-center">
-                      <div class="col-md-4">
-                          <img src="{{ obra[4] }}" class="img-fluid w-100" style="object-fit: cover;" alt="{{ obra[0] }}">
-                      </div>
-                      <div class="col-md-8">
-                          <div class="card-body bg-white">
-                              <h5 class="card-title">{{ obra[0] }}</h5>
-                              <p class="card-text"><strong>Ano de Lançamento:</strong> {{ obra[1] }}</p>
-                              <p class="card-text"><strong>Sinopse:</strong> {{ obra[2] }}</p>
-                              <p class="card-text"><strong>Duração:</strong> {{ obra[3] }} minutos</p>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          {% endfor %}
+        {% for obra in obras %}
+        <div class="col-12 mb-3">
+            <div class="card">
+                <div class="row g-0">
+                    <!-- Coluna para a imagem -->
+                    <div class="col-md-4">
+                        <img src="{{ obra[4] }}" class="img-fluid h-100" style="object-fit: cover; width: 100%; height: 100%;" alt="{{ obra[0] }}">
+                    </div>
+                    <!-- Coluna para as informações -->
+                    <div class="col-md-8">
+                        <div class="card-body bg-white">
+                            <h5 class="card-title">{{ obra[0] }}</h5>
+                            <p class="card-text"><strong>Ano de Lançamento:</strong> {{ obra[1] }}</p>
+                            <p class="card-text"><strong>Sinopse:</strong> {{ obra[2] }}</p>
+                            <p class="card-text"><strong>Duração:</strong> {{ obra[3] }} minutos</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
       </div>
   </div>
   

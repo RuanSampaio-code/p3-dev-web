@@ -198,11 +198,29 @@ def pageListaJaAssistido():
     return render_template('filmeSerieAssistido.html')
 
 
+def get_tmdb_data(endpoint, params={}):
+    """Função para buscar dados da API TMDb"""
+    base_url = "https://api.themoviedb.org/3/"
+    params['api_key'] = TMDB_API_KEY
+    params['language'] = 'pt-BR'
+    
+    response = requests.get(base_url + endpoint, params=params)
+    
+    if response.status_code == 200:
+        return response.json().get('results', [])
+    return []
+
 #Pagina de recomendacao
 @app.route('/recomedacao', methods=['GET', 'POST'])
 @login_required
 def pageRecomedacao(): 
-    return render_template('recomendacao.html')
+    filmes = get_tmdb_data('movie/popular', {'page': 1})[:5]
+    series = get_tmdb_data('tv/popular', {'page': 1})[:5]
+
+    # Misturando filmes e séries na mesma lista
+    recomendacoes = filmes + series  
+
+    return render_template('recomendacao.html', recomendacoes=recomendacoes)
 
 #pagina de perfil
 @app.route('/perfil', methods=['GET', 'POST'])
@@ -270,32 +288,30 @@ def search():
 def adicionar_catalogo():
     data = request.get_json()
     
-    # Verificar se os dados necessários estão presentes
-    if not data.get('id') or not data.get('titulo') or not data.get('tipo'):
-        return jsonify({"error": "Dados incompletos."}), 400
-
-    # Criar um novo objeto Catalogo
+    # Verificação simplificada dos dados obrigatórios
+    required_fields = ['id', 'titulo', 'tipo', 'poster_path']
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({"error": f"Campo obrigatório faltando: {field}"}), 400
+    
+    # Construir URL da imagem corretamente (poster_path já inclui a barra)
+    foto_url = f"https://image.tmdb.org/t/p/w200{data['poster_path']}"
+    
     novo_item = Catalogo(
         titulo=data['titulo'],
         sinopse=data['sinopse'],
         ano=int(data['ano']),
-        genero='Desconhecido',  # Você pode ajustar isso conforme a resposta da API
-        duracao=120,  # Aqui também você pode ajustar conforme a resposta da API (exemplo de duração de 120 minutos)
-        foto = f"https://image.tmdb.org/t/p/w200{data.get('poster_path', '')}",
-
-       # https://image.tmdb.org/t/p/w200/3onmLeu48mY87UclP3fk2x7YPqw.jpg
- # Usa o get() para evitar erro se a chave não existir
-  # Altere 'foto' para 'poster_path'
- # Adicione a foto do filme/série
+        genero='Desconhecido',  # Você pode buscar o gênero da API se necessário
+        duracao=120,  # Ajuste conforme os dados da API
+        foto=foto_url,  # Usando a URL construída
         tipo=data['tipo'],
         assistido=data['assistido'],
-        id_usuario=current_user.id  # Supondo que você tenha um sistema de autenticação para pegar o usuário atual
+        id_usuario=current_user.id
     )
-
-    # Adicionar no banco de dados
+    
     db.session.add(novo_item)
     db.session.commit()
-
+    
     return jsonify({"success": True})
 
 
@@ -334,20 +350,56 @@ def lista_ja_assistidos():
     obras = get_filmes_ja_assistidos()
     return render_template('lista_ja_assistidos.html', obras=obras)
 
-
+""" 
 @app.route('/salvar_nota/<int:obra_id>', methods=['POST'])
 def salvar_nota(obra_id):
     nota = request.form.get('nota')
+
+    # Verifica se a nota foi preenchida
     if nota:
-        # Salvar a nota no banco de dados para o filme com ID `obra_id`
-        # Adapte esse código conforme sua lógica de banco de dados
-        obra = Catalogo.query.get(obra_id)  # Exemplo com SQLAlchemy
-        obra.nota = nota
-        db.session.commit()
-        return redirect(url_for('lista_ja_assistidos'))  # Redireciona para a lista de filmes
-    return "Nota não salva", 400
+        try:
+            nota = float(nota)  # Converte para float
+
+            # Busca a obra no banco de dados
+            obra = Catalogo.query.get(obra_id)
+
+            if obra:
+                obra.nota = nota  # Atribui a nota
+                db.session.commit()  # Salva no banco de dados
+                flash("Nota salva com sucesso!", "success")  # Mensagem de sucesso
+            else:
+                flash("Obra não encontrada!", "danger")
+        except ValueError:
+            flash("Nota inválida!", "warning")  # Caso não seja um número
+        except Exception as e:
+            flash(f"Erro ao salvar nota: {str(e)}", "danger")  # Captura erros no banco
+
+    return redirect(url_for('lista_ja_assistidos'))  # Redireciona para a página principal
+
+  """
 
 
+@app.route('/salvar_nota/<int:obra_id>', methods=['GET', 'POST'])
+def salvar_nota(obra_id):
+    # Obtenha o filme do banco de dados pelo id
+    obra = Catalogo.query.get(obra_id)
+    
+    if request.method == 'POST':
+        # Obtenha a nota enviada pelo formulário
+        nova_nota = request.form.get('nota')
+        
+        if nova_nota:
+            # Converta para float e atribua à obra
+            obra.nota = float(nova_nota)
+            
+            # Salve a alteração no banco de dados
+            db.session.commit()
+
+            # Redirecione de volta para a página do filme (ou onde preferir)
+            return redirect(url_for('lista_ja_assistidos', obra_id=obra.id))
+
+    # Renderize o template com as informações do filme
+    return render_template('lista_ja_assistidos.html', obra=obra)
 
 
 
