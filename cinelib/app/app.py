@@ -96,12 +96,42 @@ def login():
 
     return render_template('login.html')
 
+def get_unique_items_by_genre(genre_id, num_items=5, media_type="movie"):
+    """Busca itens únicos de um gênero específico"""
+    url = f"https://api.themoviedb.org/3/discover/{media_type}?api_key={TMDB_API_KEY}&language=pt-BR&sort_by=popularity.desc&with_genres={genre_id}"
+    response = requests.get(url)
+    data = response.json()
+    
+    unique_items = []
+    seen_ids = set()
+
+    for item in data.get("results", []):
+        item_id = item.get("id")
+        if item_id not in seen_ids and item.get("poster_path"):  # Evita repetições e imagens vazias
+            seen_ids.add(item_id)
+            unique_items.append(item)
+        if len(unique_items) == num_items:
+            break  # Para quando alcançar o limite
+    
+    return unique_items
+
 
 #Home
 @app.route('/home')
 @login_required  # Usuário precisa estar logado para acessar
 def home():
-    return render_template('home.html')  # Certifique-se de ter um home.html no templates
+    genres = {
+        "Ação": 28,
+        "Comédia": 35,
+        "Drama": 18,
+        "Ficção Científica": 878,
+        "Terror": 27
+    }
+
+    movies = {genre: get_unique_items_by_genre(genre_id, media_type="movie") for genre, genre_id in genres.items()}
+    series = {genre: get_unique_items_by_genre(genre_id, media_type="tv") for genre, genre_id in genres.items()}
+
+    return render_template('home.html', movies=movies, series=series)
 
 #Rota para Sair da aplicação
 @app.route('/logout')
@@ -215,21 +245,6 @@ def pagePerfil():
 
 
 #Tratando a api
-""" @app.route('/search', methods=['GET'])
-def search_movie():
-    query = request.args.get('query')  # Obtém o termo da pesquisa do input
-    if not query:
-        return jsonify({"error": "Nenhuma pesquisa foi fornecida"}), 400
-
-    # Fazendo a requisição à API do TMDb
-    url = f"{TMDB_BASE_URL}/search/movie?api_key={TMDB_API_KEY}&query={query}"
-    response = requests.get(url)
-    
-    if response.status_code != 200:
-        return jsonify({"error": "Erro ao buscar filmes"}), 500
-
-    data = response.json()
-    return jsonify(data)  """ # Retorna os dados da API como JSON
 
 @app.route('/search', methods=['GET'])
 def search():
