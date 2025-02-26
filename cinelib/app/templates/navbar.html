@@ -30,7 +30,10 @@
                 <button id="search-button">Buscar</button>
             </div>
 
-            <a href="{{ url_for('logout') }}">Sair</a>
+            <!-- Botão "Sair" Estilizado -->
+            <a href="{{ url_for('logout') }}" class="btn btn-danger ms-3" role="button" style="font-size: 16px;">
+                Sair
+            </a>
         </div>
     </div>
 </nav>
@@ -42,22 +45,6 @@
         var searchBox = document.getElementById('search-box');
         searchBox.style.display = searchBox.style.display === 'none' ? 'block' : 'none';
     });
-
-    /* document.getElementById('search-button').addEventListener('click', function() {
-        var searchTerm = document.getElementById('search-input').value;
-        if (searchTerm) {
-            fetch(`/search?query=${encodeURIComponent(searchTerm)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.results) {
-                        displayResults(data.results);
-                    } else {
-                        alert("Nenhum filme encontrado!");
-                    }
-                })
-                .catch(error => console.error("Erro ao buscar filmes:", error));
-        }
-    }); */
 
     document.getElementById('search-button').addEventListener('click', function() {
     var searchTerm = document.getElementById('search-input').value;
