@@ -17,7 +17,7 @@ CineLib é uma aplicação web desenvolvida para a disciplina **Desenvolvimento 
 - ⭐ **Avaliação de Filmes e Séries (Nota de 1 a 10)**  
 - 📋 **Gerenciamento de Filmes/Séries Assistidos**  
 - 🔍 **Filtragem e Ordenação de Conteúdo**  
-- 💾 **Persistência de Dados no Banco PostgreSQL**  
+- 💾 **Persistência de Dados no Banco SQLITE**  
 
 ## Como Executar o Projeto
 
