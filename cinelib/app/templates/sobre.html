@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre o CineLib</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+</head>
+
+<body class="light-mode">
+    <div class="container mt-5">
+        <h1 class="text-center fw-bold text-white">🎬 Sobre o CineLib</h1>
+        <p class="text-center text-muted">Sua biblioteca pessoal de filmes e séries</p>
+
+        
+        <div class="mt-4 p-4 bg-light rounded shadow">
+            <p class="mt-4">
+                O <strong>CineLib</strong> é um sistema web desenvolvido para os apaixonados por filmes e séries que desejam explorar, organizar e descobrir novos conteúdos de forma prática e interativa. Ele permite que os usuários personalizem sua experiência, salvem suas produções favoritas e recebam recomendações baseadas em seus interesses.
+            </p>
+            
+            <ul class="mt-3">
+                <li>✅ Acessar um amplo catálogo de filmes e séries atualizado constantemente</li>
+                <li>✅ Criar sua própria biblioteca pessoal, organizando o que já assistiu e o que deseja ver</li>
+                <li>✅ Receber sugestões de novos títulos com base em avaliações e tendências</li>
+                <li>✅ Personalizar seu perfil e registrar suas preferências para uma experiência ainda mais imersiva</li>
+            </ul>
+            <p>
+                Nosso objetivo é tornar a experiência de assistir filmes e séries ainda mais envolvente e organizada,
+                proporcionando uma forma simples e intuitiva de gerenciar seu acervo pessoal.
+            </p>
+            <p class="text-center fw-bold">💡 Descubra, organize e viva o cinema com o CineLib!</p>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('login') }}" class="btn btn-primary">Voltar para o Login</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

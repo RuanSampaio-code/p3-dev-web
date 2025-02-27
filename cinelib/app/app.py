@@ -1,40 +1,32 @@
+import requests 
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
-import requests  # requests deve ser importado separadamente
-
 
 #Lib para banco de dados
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-import sqlite3  # Ou qualquer outro banco de dados que você esteja usando
+import sqlite3 
 
 #Lib auteticação
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
 
-
 app = Flask(__name__)
-
 app.secret_key = 'sua_chave_super_secreta'  # Substitua por algo único e seguro
 
 # Sua chave de API do TMDb (substitua pela sua)
 TMDB_API_KEY = "3b653dd935ec9fc21b679170f3bff41a"
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
-
-
 # Configurar a URI do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cinelib.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-
 login_manager = LoginManager(app)
 
-
-#Modelos
+# ---------------------------------------------------------------------------------Modelos - BANCO DE DADOS -------------------------------------------------------------
 class Usuario(UserMixin, db.Model):
     __tablename__ = "usuarios"
     
@@ -64,7 +56,7 @@ class Catalogo(db.Model):
     # Novo campo de nota, com valor entre 0 e 10
     nota = db.Column(db.Float, nullable=True)  # Pode ser nulo ou com valores entre 0 e 10
 
-    # Validação de nota (opcional, dependendo da biblioteca que você está usando)
+    
     def set_nota(self, nota):
         if 0 <= nota <= 10:
             self.nota = nota
@@ -76,10 +68,9 @@ class Catalogo(db.Model):
 
 
 
+# -------------------------------------------------------------------------------ROTAS  INICIAIS
 
-""" Rota inicial """
-
-#Login
+# Rota inicial - Login
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -96,42 +87,12 @@ def login():
 
     return render_template('login.html')
 
-def get_unique_items_by_genre(genre_id, num_items=5, media_type="movie"):
-    """Busca itens únicos de um gênero específico"""
-    url = f"https://api.themoviedb.org/3/discover/{media_type}?api_key={TMDB_API_KEY}&language=pt-BR&sort_by=popularity.desc&with_genres={genre_id}"
-    response = requests.get(url)
-    data = response.json()
-    
-    unique_items = []
-    seen_ids = set()
-
-    for item in data.get("results", []):
-        item_id = item.get("id")
-        if item_id not in seen_ids and item.get("poster_path"):  # Evita repetições e imagens vazias
-            seen_ids.add(item_id)
-            unique_items.append(item)
-        if len(unique_items) == num_items:
-            break  # Para quando alcançar o limite
-    
-    return unique_items
+#pagina sobre
+@app.route('/sobre')
+def sobre():
+    return render_template('sobre.html')
 
 
-#Home
-@app.route('/home')
-@login_required  # Usuário precisa estar logado para acessar
-def home():
-    genres = {
-        "Ação": 28,
-        "Comédia": 35,
-        "Drama": 18,
-        "Ficção Científica": 878,
-        "Terror": 27
-    }
-
-    movies = {genre: get_unique_items_by_genre(genre_id, media_type="movie") for genre, genre_id in genres.items()}
-    series = {genre: get_unique_items_by_genre(genre_id, media_type="tv") for genre, genre_id in genres.items()}
-
-    return render_template('home.html', movies=movies, series=series)
 
 #Rota para Sair da aplicação
 @app.route('/logout')
@@ -147,7 +108,7 @@ def load_user(user_id):
     return Usuario.query.get(int(user_id))
 
 
-#cadastro
+# Pagina de cadastro
 @app.route('/cadastro', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -177,11 +138,33 @@ def register():
 
     return render_template('cadastro.html')
 
+
+#Pagina Home
+@app.route('/home')
+@login_required  # Usuário precisa estar logado para acessar
+def home():
+    genres = {
+        "Ação": 28,
+        "Comédia": 35,
+        "Drama": 18,
+        "Ficção Científica": 878,
+        "Terror": 27
+    }
+
+    movies = {genre: get_unique_items_by_genre(genre_id, media_type="movie") for genre, genre_id in genres.items()}
+    series = {genre: get_unique_items_by_genre(genre_id, media_type="tv") for genre, genre_id in genres.items()}
+
+    return render_template('home.html', movies=movies, series=series)
+
+
 #Pagina da biblioteca
 @app.route('/biblioteca', methods=['GET', 'POST'])
 @login_required
 def pageBiblioteca(): 
     return render_template('biblioteca.html')
+
+
+
 
 
 #Pagina de lista de filmes e series para assitir
@@ -197,30 +180,6 @@ def pageListaParaAssistir():
 def pageListaJaAssistido(): 
     return render_template('filmeSerieAssistido.html')
 
-
-def get_tmdb_data(endpoint, params={}):
-    """Função para buscar dados da API TMDb"""
-    base_url = "https://api.themoviedb.org/3/"
-    params['api_key'] = TMDB_API_KEY
-    params['language'] = 'pt-BR'
-    
-    response = requests.get(base_url + endpoint, params=params)
-    
-    if response.status_code == 200:
-        return response.json().get('results', [])
-    return []
-
-#Pagina de recomendacao
-@app.route('/recomedacao', methods=['GET', 'POST'])
-@login_required
-def pageRecomedacao(): 
-    filmes = get_tmdb_data('movie/popular', {'page': 1})[:5]
-    series = get_tmdb_data('tv/popular', {'page': 1})[:5]
-
-    # Misturando filmes e séries na mesma lista
-    recomendacoes = filmes + series  
-
-    return render_template('recomendacao.html', recomendacoes=recomendacoes)
 
 #pagina de perfil
 @app.route('/perfil', methods=['GET', 'POST'])
@@ -247,24 +206,43 @@ def pagePerfil():
 
 
 
+def get_tmdb_data(endpoint, params={}):
+    """Função para buscar dados da API TMDb"""
+    base_url = "https://api.themoviedb.org/3/"
+    params['api_key'] = TMDB_API_KEY
+    params['language'] = 'pt-BR'
+    
+    response = requests.get(base_url + endpoint, params=params)
+    
+    if response.status_code == 200:
+        return response.json().get('results', [])
+    return []
 
+#Pagina de recomendacao
+@app.route('/recomedacao', methods=['GET', 'POST'])
+@login_required
+def pageRecomedacao(): 
+    # Filmes e séries populares
+    filmes_populares = get_tmdb_data('movie/popular', {'page': 1})[:5]
+    series_populares = get_tmdb_data('tv/popular', {'page': 1})[:5]
 
+    # Filmes e séries mais bem avaliados
+    filmes_top = get_tmdb_data('movie/top_rated', {'page': 1})[:5]
+    series_top = get_tmdb_data('tv/top_rated', {'page': 1})[:5]
 
+    # Misturando os filmes e séries em grupos
+    recomendacoes_populares = filmes_populares + series_populares
+    recomendacoes_top = filmes_top + series_top
 
-
-
-
-
-
-
-
-
-
+    return render_template('recomendacao.html', 
+                           recomendacoes_populares=recomendacoes_populares, 
+                           recomendacoes_top=recomendacoes_top)
 
 
 #Tratando a api
 
 @app.route('/search', methods=['GET'])
+@login_required
 def search():
     query = request.args.get('query')
 
@@ -283,8 +261,29 @@ def search():
 
 
 
+def get_unique_items_by_genre(genre_id, num_items=5, media_type="movie"):
+    """Busca itens únicos de um gênero específico"""
+    url = f"https://api.themoviedb.org/3/discover/{media_type}?api_key={TMDB_API_KEY}&language=pt-BR&sort_by=popularity.desc&with_genres={genre_id}"
+    response = requests.get(url)
+    data = response.json()
+    
+    unique_items = []
+    seen_ids = set()
 
+    for item in data.get("results", []):
+        item_id = item.get("id")
+        if item_id not in seen_ids and item.get("poster_path"):  # Evita repetições e imagens vazias
+            seen_ids.add(item_id)
+            unique_items.append(item)
+        if len(unique_items) == num_items:
+            break  # Para quando alcançar o limite
+    
+    return unique_items
+
+
+#Funcionalidade de adcionar ao catalogo
 @app.route('/adicionar_catalogo', methods=['POST'])
+@login_required
 def adicionar_catalogo():
     data = request.get_json()
     
@@ -315,10 +314,7 @@ def adicionar_catalogo():
     return jsonify({"success": True})
 
 
-
-
-
-# Conectando ao banco de dados e recuperando os filmes
+# Conectando ao banco de dados e recuperando os filmes cadastrados para ver futuramente
 def get_filmes_para_assistir():
     # Conecte-se ao banco de dados (substitua pelo seu banco de dados)
     conn = sqlite3.connect('instance/cinelib.db')
@@ -329,10 +325,10 @@ def get_filmes_para_assistir():
     return obras
 
 @app.route('/lista-para-assistir')
+@login_required
 def lista_para_assistir():
     obras = get_filmes_para_assistir()
     return render_template('lista_para_assistir.html', obras=obras)
-
 
 
 # Conectando ao banco de dados e recuperando os filmes
@@ -345,40 +341,17 @@ def get_filmes_ja_assistidos():
     conn.close()
     return obras
 
+#Lista de filmes ja assitidos
 @app.route('/lista-ja-assitidos')
+@login_required
 def lista_ja_assistidos():
     obras = get_filmes_ja_assistidos()
     return render_template('lista_ja_assistidos.html', obras=obras)
-""" 
 
-@app.route('/salvar_nota/<int:obra_id>', methods=['POST'])
-def salvar_nota(obra_id):
-    nota = request.form.get('nota')
 
-    # Verifica se a nota foi preenchida
-    if nota:
-        try:
-            nota = float(nota)  # Converte para float
-
-            # Busca a obra no banco de dados
-            obra = Catalogo.query.get(obra_id)
-
-            if obra:
-                obra.nota = nota  # Atribui a nota
-                db.session.commit()  # Salva no banco de dados
-                flash("Nota salva com sucesso!", "success")  # Mensagem de sucesso
-            else:
-                flash("Obra não encontrada!", "danger")
-        except ValueError:
-            flash("Nota inválida!", "warning")  # Caso não seja um número
-        except Exception as e:
-            flash(f"Erro ao salvar nota: {str(e)}", "danger")  # Captura erros no banco
-
-    return redirect(url_for('lista_ja_assistidos'))  # Redireciona para a página principal
-
-  """
-
+#Funcionalide de adcionar uma nota a um filme ja assitido
 @app.route('/salvar_nota/<int:obra_id>', methods=['GET', 'POST'])
+@login_required
 def salvar_nota(obra_id):
     # Obtenha o filme do banco de dados pelo id
     obra = db.session.get(Catalogo, obra_id) 
@@ -399,14 +372,6 @@ def salvar_nota(obra_id):
 
     # Renderize o template com as informações do filme
     return render_template('lista_ja_assistidos.html', obra=obra)
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':

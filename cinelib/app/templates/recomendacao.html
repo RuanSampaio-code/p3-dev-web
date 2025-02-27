@@ -15,12 +15,31 @@
     {% include 'navbar.html' %}
 
     <div class="container mt-5">
-        <h2 class="text-white">Filmes e Séries da Atualidade</h2>
+        <h2 class="text-white">Filmes e Séries populares</h2>
         <div class="row">
-            {% for item in recomendacoes %}
+            {% for item in recomendacoes_populares %}
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
                 <div class="card">
-                    <img class="card-img-top" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" alt="{{ item.title or item.name }}">
+                    <img class="card-img-top img-fluid custom-img" 
+                         src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" 
+                         alt="{{ item.title or item.name }}">
+                    <div class="card-body">
+                        <p class="card-text text-center">{{ item.title or item.name }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Seção Mais Bem Avaliados -->
+        <h2 class="text-white mt-5">Filmes e Séries Mais Bem Avaliados</h2>
+        <div class="row">
+            {% for item in recomendacoes_top %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="card">
+                    <img class="card-img-top img-fluid custom-img" 
+                         src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" 
+                         alt="{{ item.title or item.name }}">
                     <div class="card-body">
                         <p class="card-text text-center">{{ item.title or item.name }}</p>
                     </div>
