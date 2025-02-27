@@ -37,24 +37,17 @@
                                     <p class="card-text"><strong>Sinopse:</strong> {{ obra[3] }}</p>
                                     <p class="card-text"><strong>Duração:</strong> {{ obra[4] }} minutos</p>
                     
-                                    <!-- Exibindo a nota, se ela existir -->
-                                    <p class="card-text"><strong>Sua Nota:</strong> 
-                                        {% if obra.nota %}
-                                            {{ obra.nota }}
-                                        {% else %}
-                                            Ainda não avaliado
-                                        {% endif %}
-                                    </p>
-                    
+                                    
                                     <!-- Campo para inserção de nota -->
                                     <form method="POST" action="{{ url_for('salvar_nota', obra_id=obra[0]) }}">
                                         <div class="mb-3">
                                             <label for="nota" class="form-label">Sua Nota:</label>
                                             <input type="number" class="form-control" id="nota" name="nota" min="1" max="10" step="0.1" placeholder="De 1 a 10" 
-                                                value="{{ obra.nota if obra.nota else '' }}">
+                                            value="{{ obra[6] if obra[6] else '' }}">
                                         </div>
                                         <button type="submit" class="btn btn-primary">Salvar Nota</button>
                                     </form>
+
                                 </div>
                             </div>
                         </div>

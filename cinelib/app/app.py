@@ -340,7 +340,7 @@ def get_filmes_ja_assistidos():
     # Conecte-se ao banco de dados (substitua pelo seu banco de dados)
     conn = sqlite3.connect('instance/cinelib.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT id,titulo, ano, sinopse, duracao, foto FROM Catalogo WHERE assistido = 1")  # 0 significa não assistido
+    cursor.execute("SELECT id,titulo, ano, sinopse, duracao, foto, nota FROM Catalogo WHERE assistido = 1")  # 0 significa não assistido
     obras = cursor.fetchall()
     conn.close()
     return obras
@@ -349,8 +349,8 @@ def get_filmes_ja_assistidos():
 def lista_ja_assistidos():
     obras = get_filmes_ja_assistidos()
     return render_template('lista_ja_assistidos.html', obras=obras)
-
 """ 
+
 @app.route('/salvar_nota/<int:obra_id>', methods=['POST'])
 def salvar_nota(obra_id):
     nota = request.form.get('nota')
@@ -378,12 +378,11 @@ def salvar_nota(obra_id):
 
   """
 
-
 @app.route('/salvar_nota/<int:obra_id>', methods=['GET', 'POST'])
 def salvar_nota(obra_id):
     # Obtenha o filme do banco de dados pelo id
-    obra = Catalogo.query.get(obra_id)
-    
+    obra = db.session.get(Catalogo, obra_id) 
+
     if request.method == 'POST':
         # Obtenha a nota enviada pelo formulário
         nova_nota = request.form.get('nota')
