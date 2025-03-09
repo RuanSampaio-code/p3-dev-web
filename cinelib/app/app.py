@@ -1,4 +1,4 @@
-import requests 
+import requests, os 
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 
 #Lib para banco de dados
@@ -14,8 +14,8 @@ app = Flask(__name__)
 app.secret_key = 'sua_chave_super_secreta'  # Substitua por algo único e seguro
 
 # Sua chave de API do TMDb (substitua pela sua)
-TMDB_API_KEY = "3b653dd935ec9fc21b679170f3bff41a"
-TMDB_BASE_URL = "https://api.themoviedb.org/3"
+TMDB_API_KEY = os.getenv('FLASK_API_KEY_TMDB')
+TMDB_BASE_URL = "https://api.themoviedb.org/3/"
 
 # Configurar a URI do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cinelib.db'
@@ -208,7 +208,7 @@ def pagePerfil():
 
 def get_tmdb_data(endpoint, params={}):
     """Função para buscar dados da API TMDb"""
-    base_url = "https://api.themoviedb.org/3/"
+    base_url = TMDB_BASE_URL
     params['api_key'] = TMDB_API_KEY
     params['language'] = 'pt-BR'
     
