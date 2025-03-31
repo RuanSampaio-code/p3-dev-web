@@ -1,2 +1,5 @@
-#Ambinete virtual
+# Ambiente virtual
 **/.venv
+
+# Ignorar o banco de dados local
+cinelib/app/instance/cinelib.db
