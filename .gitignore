@@ -1,5 +1,5 @@
 # Ambiente virtual
-**/.venv
-
+# Ignorar a pasta venv
+cinelib/venv/
 # Ignorar o banco de dados local
 cinelib/app/instance/cinelib.db
