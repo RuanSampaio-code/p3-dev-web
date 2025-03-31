@@ -6,7 +6,6 @@ CineLib é uma aplicação web desenvolvida para a disciplina **Desenvolvimento 
 ## Tecnologias Utilizadas
 - **Flask** - Framework web para backend em Python
 - **SQLAlchemy** - ORM para gerenciamento do banco de dados
-- **PostgreSQL** - Banco de dados relacional
 - **Jinja2** - Template engine para renderização de páginas dinâmicas
 - **Bootstrap** - Framework CSS para estilização
 - **TMDB API** - Para obtenção de informações sobre filmes e séries
